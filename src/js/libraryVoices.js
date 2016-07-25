@@ -38,15 +38,10 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
             "funcName": "ca.alanharnum.libraryVoices.bindCheckableToModelPath",
             "args": ["{that}", "nonEngVoicesCheck", "controlOpts.nonEngVoices"],
             "priority": "after:appendMarkup"
-        },
-        "onCreate.openSocket": {
-            "funcName": "ca.alanharnum.libraryVoices.startSpeaking",
-            "args": ["{that}"],
-            "priority": "after:appendMarkup"
         }
     },
     markup: {
-        componentTemplate: "<h2 class=\"lvPage-header\">Controls</h2><p class=\"lv-controlArea\"><a href=\"#\" class=\"lv-control lv-startControl\">Start</a> <a href=\"#\" class=\"lv-stopControl lv-control\">Stop</a> <br> Log Search Terms &amp; Voices: <input type=\"checkbox\" class=\"lv-termsLogCheck\" /> <br> Enable non-English Voices to be Selected: <input type=\"checkbox\" class=\"lv-nonEngVoicesCheck\" /> <h2 class=\"lvPage-header\">Log</h2></p><p aria-live=\"polite\" class=\"lv-controlLog\"></p><ol aria-live=\"polite\" class=\"lv-termsLog\"></ol>"
+        componentTemplate: "<h2 class=\"lvPage-header\">Controls</h2><p class=\"lv-controlArea\"><a href=\"#\" class=\"lv-linkControl lv-startControl\">Start</a> <a href=\"#\" class=\"lv-stopControl lv-linkControl\">Stop</a> <br> <label>Log Search Terms &amp; Voices: <input type=\"checkbox\" class=\"lv-termsLogCheck lv-checkboxControl\" /></label> <br> <label>Enable non-English Voices to be Selected: <input type=\"checkbox\" class=\"lv-nonEngVoicesCheck lv-checkboxControl\" /></label> <h2 class=\"lvPage-header\">Log</h2></p><p aria-live=\"polite\" class=\"lv-controlLog\"></p><ol aria-live=\"polite\" class=\"lv-termsLog\"></ol>"
     },
     model: {
         socketOpts: {
