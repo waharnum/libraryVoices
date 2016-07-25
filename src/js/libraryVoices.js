@@ -109,9 +109,7 @@ ca.alanharnum.libraryVoices.speakTerms = function (that, terms) {
     var random = ca.alanharnum.libraryVoices.randomInt(0, availableVoices.length);
     var voiceToUse = availableVoices[random];
 
-    if (that.model.controlOpts.termsLog) {
-        ca.alanharnum.libraryVoices.logTerms(that, terms, voiceToUse);
-    }
+    ca.alanharnum.libraryVoices.logTerms(that, terms, voiceToUse);
 
     if(voiceToUse) {
         that.textToSpeech.applier.change("utteranceOpts.lang", voiceToUse.lang);
@@ -123,6 +121,9 @@ ca.alanharnum.libraryVoices.speakTerms = function (that, terms) {
 };
 
 ca.alanharnum.libraryVoices.logTerms = function (that, terms, voice) {
+    if (!that.model.controlOpts.termsLog) {
+        return;
+    }
     var voiceName = voice ? voice.name : "unknown";
     var voiceLang = voice ? voice.lang : "unknown";
     that.locate("termsLog").append("<li>Search terms <span class=\"lv-searchTerms\">" + terms + "</span> spoken by <span class=\"lv-voiceCredit\">" + voiceName + " ("+ voiceLang + ")" + "</span></li>");

@@ -4,6 +4,8 @@ A web toy that uses the same WebSocket feed of anonymized realtime search data f
 
 <p>Not an official TPL thing, made by <a href="https://twitter.com/waharnum">Alan Harnum</a> using the <a href="http://fluidproject.org/infusion.html">Infusion</a> Javascript framework..</p>
 
+<p>Viewable live via the magic of [RawGit](https://rawgit.com/) at [http://cdn.rawgit.com/waharnum/libraryVoices/master/index.html](http://cdn.rawgit.com/waharnum/libraryVoices/master/index.html)</p>
+
 ## License (BSD 2-Clause):
 
 ```
