@@ -8,7 +8,10 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
     selectors: {
         stopControl: ".lv-stopControl",
         startControl: ".lv-startControl",
-        loggingArea: ".lv-loggingArea"
+        termsLogCheck: ".lv-termsLogCheck",
+        nonEngVoicesCheck: ".lv-nonEngVoicesCheck",
+        controlLog: ".lv-controlLog",
+        termsLog: ".lv-termsLog"
     },
     listeners: {
         "onCreate.appendMarkup": {
@@ -26,6 +29,16 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
             "args": ["{that}", "startControl", "{that}.startSpeaking"],
             "priority": "after:appendMarkup"
         },
+        "onCreate.bindLogVoicesCheckbox": {
+            "funcName": "ca.alanharnum.libraryVoices.bindCheckableToModelPath",
+            "args": ["{that}", "termsLogCheck", "controlOpts.termsLog"],
+            "priority": "after:appendMarkup"
+        },
+        "onCreate.bindNonEngVoicesCheckbox": {
+            "funcName": "ca.alanharnum.libraryVoices.bindCheckableToModelPath",
+            "args": ["{that}", "nonEngVoicesCheck", "controlOpts.nonEngVoices"],
+            "priority": "after:appendMarkup"
+        },
         "onCreate.openSocket": {
             "funcName": "ca.alanharnum.libraryVoices.startSpeaking",
             "args": ["{that}"],
@@ -33,11 +46,15 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
         }
     },
     markup: {
-        componentTemplate: "<p class=\"lv-controlArea\"><a href=\"#\" class=\"lv-control lv-startControl\">Start</a> <a href=\"#\" class=\"lv-stopControl lv-control\">Stop</a></p><p class=\"lv-loggingArea\"></p>"
+        componentTemplate: "<h2 class=\"lvPage-header\">Controls</h2><p class=\"lv-controlArea\"><a href=\"#\" class=\"lv-control lv-startControl\">Start</a> <a href=\"#\" class=\"lv-stopControl lv-control\">Stop</a> <br> Log Search Terms &amp; Voices: <input type=\"checkbox\" class=\"lv-termsLogCheck\" /> <br> Enable non-English Voices to be Selected: <input type=\"checkbox\" class=\"lv-nonEngVoicesCheck\" /> <h2 class=\"lvPage-header\">Log</h2></p><p aria-live=\"polite\" class=\"lv-controlLog\"></p><ol aria-live=\"polite\" class=\"lv-termsLog\"></ol>"
     },
     model: {
         socketOpts: {
             url: "ws://45.55.209.67:4571/rtsearches"
+        },
+        controlOpts: {
+            termsLog: false,
+            nonEngVoices: false
         }
     },
     invokers: {
@@ -59,16 +76,23 @@ ca.alanharnum.libraryVoices.bindClickFunction = function (that, controlSelector,
     });
 };
 
+ca.alanharnum.libraryVoices.bindCheckableToModelPath = function (that, checkableSelector, modelPath) {
+    that.locate(checkableSelector).change(function (e) {
+        var isChecked = $(this).prop("checked");
+        that.applier.change(modelPath, isChecked);
+        e.preventDefault();
+    });
+};
+
 ca.alanharnum.libraryVoices.stopSpeaking = function (that) {
-        console.log("stop called");
         that.socket.close();
         that.textToSpeech.cancel();
-        that.locate("loggingArea").text("Shushed!");
+        that.locate("termsLog").empty();
+        that.locate("controlLog").text("Shushed!");
 };
 
 ca.alanharnum.libraryVoices.startSpeaking = function (that) {
-    console.log("start called");
-    that.locate("loggingArea").text("Library voices are speaking...");
+    that.locate("controlLog").text("Library voices are speaking...");
     that.socket = new WebSocket(that.model.socketOpts.url);
     that.socket.onmessage = function (e) {
         var terms = JSON.parse(e.data)[0].terms;
@@ -79,14 +103,20 @@ ca.alanharnum.libraryVoices.startSpeaking = function (that) {
 ca.alanharnum.libraryVoices.speakTerms = function (that, terms) {
     var availableVoices = fluid.copy(that.textToSpeech.getVoices());
 
-    // Filter to English-only voices
-    fluid.remove_if(availableVoices, function (voice) {
-        return voice.lang.indexOf("en-") < 0;
-    });
+    // Filter to English-only voices if option is on
+    if(!that.model.controlOpts.nonEngVoices) {
+        fluid.remove_if(availableVoices, function (voice) {
+            return voice.lang.indexOf("en-") < 0;
+        });
+    }
 
     // Get a random voices
     var random = ca.alanharnum.libraryVoices.randomInt(0, availableVoices.length);
     var voiceToUse = availableVoices[random];
+
+    if (that.model.controlOpts.termsLog) {
+        ca.alanharnum.libraryVoices.logTerms(that, terms, voiceToUse);
+    }
 
     if(voiceToUse) {
         that.textToSpeech.applier.change("utteranceOpts.lang", voiceToUse.lang);
@@ -95,6 +125,12 @@ ca.alanharnum.libraryVoices.speakTerms = function (that, terms) {
     }
 
     that.textToSpeech.queueSpeech(terms);
+};
+
+ca.alanharnum.libraryVoices.logTerms = function (that, terms, voice) {
+    var voiceName = voice ? voice.name : "unknown";
+    var voiceLang = voice ? voice.lang : "unknown";
+    that.locate("termsLog").append("<li>Search terms <span class=\"lv-searchTerms\">" + terms + "</span> spoken by <span class=\"lv-voiceCredit\">" + voiceName + " ("+ voiceLang + ")" + "</span></li>");
 };
 
 ca.alanharnum.libraryVoices.randomInt = function (min, max) {

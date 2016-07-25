@@ -12,3 +12,11 @@ body {
     font-family: monospace;
     background-color: #FFefcc;
 }
+
+.lv-searchTerms {
+    font-weight: bold;
+}
+
+.lv-voiceCredit {
+    font-style: italic;
+}
