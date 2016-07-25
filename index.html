@@ -3,20 +3,28 @@
 <title>Library Voices</title>
 <script src="src/lib/infusion/infusion-all.js"></script>
 <script src="src/js/libraryVoices.js"></script>
-<link rel="stylesheet" type="text/css" href="src/css/normalize.css">
+<link rel="stylesheet" type="text/css" href="src/lib/css/normalize.css">
+<link rel="stylesheet" type="text/css" href="src/css/libraryVoices.css">
 </head>
 
 <body>
-    <h1>Library Voices</h1>
+    <h1 class="lvPage-header">Library Voices</h1>
+    <div class="lvPage-card">
+        <ol>
+            <li>Libraries--Speech synthesis.</li>
+            <li>Online bibliographic searching--Speech synthesis.</li>
+            <li>Information retrieval--Speech synthesis.</li>
+        </ol>
+    </div>
+
     <p>This page uses the same WebSocket feed of anonymized realtime search data from Toronto Public Library as the <a href="http://dashboard.tpllabs.ca/index.html">Search Dashboard</a>.</p>
 
-    <p>However, it streams it to the Speech Synthesis API of the browser rather than to the screen.</p>
-
-    <p>Depends on your browser's <a href="http://caniuse.com/#feat=speech-synthesis">support for speech synthesis</a>.</p>
+    <p>However, it streams it to the Speech Synthesis API of the browser rather than to the screen. Hearing sound depends on your browser's <a href="http://caniuse.com/#feat=speech-synthesis">support for speech synthesis</a>.</p>
 
     <p>Not an official TPL thing, made by <a href="https://twitter.com/waharnum">Alan Harnum</a> using the <a href="http://fluidproject.org/infusion.html">Infusion</a> Javascript framework.</p>
 
     <hr/>
+    <h2 class="lvPage-header">Controls</h2>
     <div class="libraryVoices"></div>
 
 <script>

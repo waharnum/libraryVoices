@@ -6,18 +6,18 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
         }
     },
     selectors: {
-        stop: ".pleaseMakeItStop",
-        loggingArea: ".loggingArea"
+        stopControl: ".lv-stopControl",
+        loggingArea: ".lv-loggingArea"
     },
     listeners: {
         "onCreate.appendMarkup": {
             "this": "{that}.container",
             "method": "append",
-            "args": "<a href=\"#\" class=\"pleaseMakeItStop\">Stop</a><h2 class=\"loggingArea\"></h2>"
+            "args": "<a href=\"#\" class=\"lv-stopControl\">Stop</a><p class=\"lv-loggingArea\"></p>"
         },
         "onCreate.bindClickToStop": {
-            "funcName": "ca.alanharnum.libraryVoices.bindClickToStop",
-            "args": ["{that}"]
+            "funcName": "ca.alanharnum.libraryVoices.bindClickFunction",
+            "args": ["{that}", "stopControl", "{that}.stopSpeaking"]
         },
         "onCreate.openSocket": {
             "funcName": "ca.alanharnum.libraryVoices.openSocket",
@@ -38,19 +38,19 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
     }
 });
 
-ca.alanharnum.libraryVoices.bindClickToStop = function (that) {
-    that.locate("stop").click(function (e) {
-        that.stopSpeaking();
+ca.alanharnum.libraryVoices.bindClickFunction = function (that, controlSelector, controlInvoker) {
+    that.locate(controlSelector).click(function (e) {
+        controlInvoker();
         e.preventDefault();
     });
-}
+};
 
 ca.alanharnum.libraryVoices.stopSpeaking = function (that) {
-        console.log("stop called")
+        console.log("stop called");
         that.socket.close();
         that.textToSpeech.cancel();
         that.locate("loggingArea").text("Shushed! Reload page to resume.");
-}
+};
 
 ca.alanharnum.libraryVoices.openSocket = function (that) {
     that.socket = new WebSocket(that.model.socketOpts.url);
@@ -58,7 +58,7 @@ ca.alanharnum.libraryVoices.openSocket = function (that) {
         var terms = JSON.parse(e.data)[0].terms;
         ca.alanharnum.libraryVoices.speakTerms(that, terms);
     };
-}
+};
 
 ca.alanharnum.libraryVoices.speakTerms = function (that, terms) {
     var availableVoices = fluid.copy(that.textToSpeech.getVoices());
@@ -79,8 +79,8 @@ ca.alanharnum.libraryVoices.speakTerms = function (that, terms) {
     }
 
     that.textToSpeech.queueSpeech(terms);
-}
+};
 
 ca.alanharnum.libraryVoices.openSocket.randomInt = function (min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
-}
+};
