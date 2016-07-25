@@ -2,9 +2,9 @@
 
 A web toy that uses the same WebSocket feed of anonymized realtime search data from Toronto Public Library as the <a href="http://dashboard.tpllabs.ca/index.html">Search Dashboard</a>. However, it streams to the Speech Synthesis API of the browser rather than to the screen. Hearing sound depends on your browser's <a href="http://caniuse.com/#feat=speech-synthesis">support for speech synthesis</a>.</p>
 
-<p>Not an official TPL thing, made by <a href="https://twitter.com/waharnum">Alan Harnum</a> using the <a href="http://fluidproject.org/infusion.html">Infusion</a> Javascript framework..</p>
+Not an official TPL thing, made by <a href="https://twitter.com/waharnum">Alan Harnum</a> using the <a href="http://fluidproject.org/infusion.html">Infusion</a> Javascript framework.
 
-<p>Viewable live via the magic of [RawGit](https://rawgit.com/) at [http://cdn.rawgit.com/waharnum/libraryVoices/master/index.html](http://cdn.rawgit.com/waharnum/libraryVoices/master/index.html)</p>
+Viewable live via the magic of [RawGit](https://rawgit.com/) at [http://cdn.rawgit.com/waharnum/libraryVoices/master/index.html](http://cdn.rawgit.com/waharnum/libraryVoices/master/index.html)
 
 ## License (BSD 2-Clause):
 
