@@ -8,58 +8,106 @@
     <h1>Library Voices</h1>
     <p>This page uses the same WebSocket feed of anonymized realtime search data from Toronto Public Library as the <a href="http://dashboard.tpllabs.ca/index.html">Dashboard project</a>.</p>
 
-    <p>However, it streams it to the textToSpeech API of the browser rather than to the screen.</p>
+    <p>However, it streams it to the Speech Synthesis API of the browser rather than to the screen.</p>
 
-    <p>Tested in Chrome on Mac only at this point.</p>
+    <p>Depends on your browser's <a href="http://caniuse.com/#feat=speech-synthesis">support for speech synthesis</a>.</p>
 
     <p>Not an official TPL thing, made by <a href="https://twitter.com/waharnum">Alan Harnum</a>.</p>
 
-    <a href="#" id="pleaseMakeItStop">Please Make It Stop</a>
-    <span id="loggingArea"></span>
+    <hr/>
+    <div class="libraryVoices"></div>
 
 <script>
 
-var textToSpeech = fluid.textToSpeech({});
+fluid.defaults("ca.alanharnum.libraryVoices", {
+    gradeNames: ["fluid.viewComponent"],
+    components: {
+        textToSpeech: {
+            type: "fluid.textToSpeech"
+        }
+    },
+    selectors: {
+        stop: ".pleaseMakeItStop",
+        loggingArea: ".loggingArea"
+    },
+    listeners: {
+        "onCreate.appendMarkup": {
+            "this": "{that}.container",
+            "method": "append",
+            "args": "<a href=\"#\" class=\"pleaseMakeItStop\">Stop</a><h2 class=\"loggingArea\"></h2>"
+        },
+        "onCreate.bindClickToStop": {
+            "funcName": "ca.alanharnum.libraryVoices.bindClickToStop",
+            "args": ["{that}"]
+        },
+        "onCreate.openSocket": {
+            "funcName": "ca.alanharnum.libraryVoices.openSocket",
+            "args": ["{that}"],
+            "priority": "after:appendMarkup"
+        }
+    },
+    model: {
+        socketOpts: {
+            url: "ws://45.55.209.67:4571/rtsearches"
+        }
+    },
+    invokers: {
+        "stopSpeaking": {
+            funcName: "ca.alanharnum.libraryVoices.stopSpeaking",
+            args: "{that}"
+        }
+    }
+});
 
-var getRandomInt = function(min, max) {
-    console.log(min, max)
-     return Math.floor(Math.random() * (max - min)) + min;
+ca.alanharnum.libraryVoices.bindClickToStop = function (that) {
+    that.locate("stop").click(function (e) {
+        that.stopSpeaking();
+        e.preventDefault();
+    });
+}
+
+ca.alanharnum.libraryVoices.stopSpeaking = function (that) {
+        console.log("stop called")
+        that.socket.close();
+        that.textToSpeech.cancel();
+        that.locate("loggingArea").text("Shushed! Reload page to resume.");
+}
+
+ca.alanharnum.libraryVoices.openSocket = function (that) {
+    that.socket = new WebSocket(that.model.socketOpts.url);
+    that.socket.onmessage = function (e) {
+        var terms = JSON.parse(e.data)[0].terms;
+        ca.alanharnum.libraryVoices.speakTerms(that, terms);
+    };
+}
+
+ca.alanharnum.libraryVoices.speakTerms = function (that, terms) {
+    var availableVoices = fluid.copy(that.textToSpeech.getVoices());
+
+    // Filter to English-only voices
+    fluid.remove_if(availableVoices, function (voice) {
+        return voice.lang.indexOf("en-") < 0;
+    });
+
+    // Get a random voices
+    var random = ca.alanharnum.libraryVoices.openSocket.randomInt(0, availableVoices.length);
+    var voiceToUse = availableVoices[random];
+
+    if(voiceToUse) {
+        that.textToSpeech.applier.change("utteranceOpts.lang", voiceToUse.lang);
+        that.textToSpeech.applier.change("utteranceOpts.voiceURI", voiceToUse.voiceURI);
+        that.textToSpeech.applier.change("utteranceOpts.voice", voiceToUse);
+    }
+
+    that.textToSpeech.queueSpeech(terms);
+}
+
+ca.alanharnum.libraryVoices.openSocket.randomInt = function (min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
 }
 
 $(document).ready(function ()  {
-
-    // var ttsBeforeStopping = 5;
-    var socket;
-
-    $("#pleaseMakeItStop").click(function (e) {
-        socket.close();
-        textToSpeech.cancel();
-        e.preventDefault();
-    });
-
-    socket = new WebSocket("ws://45.55.209.67:4571/rtsearches");
-    socket.onmessage = function (e) {
-        var terms = JSON.parse(e.data)[0].terms
-        var availableVoices = fluid.copy(textToSpeech.getVoices());
-
-        // Filter to English-only voices
-        fluid.remove_if(availableVoices, function (voice) {
-            return voice.lang.indexOf("en-") < 0;
-        });
-
-        // Get a random voices
-        var random = getRandomInt(0, availableVoices.length);
-        var voiceToUse = availableVoices[random];
-
-        if(voiceToUse) {
-            textToSpeech.applier.change("utteranceOpts.lang", voiceToUse.lang);
-            textToSpeech.applier.change("utteranceOpts.voiceURI", voiceToUse.voiceURI);
-            textToSpeech.applier.change("utteranceOpts.voice", voiceToUse);
-        }
-
-        textToSpeech.queueSpeech(terms);
-    };
-
+    var libraryVoices = ca.alanharnum.libraryVoices(".libraryVoices");
 });
 
 </script>
