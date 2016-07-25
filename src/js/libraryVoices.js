@@ -7,23 +7,33 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
     },
     selectors: {
         stopControl: ".lv-stopControl",
+        startControl: ".lv-startControl",
         loggingArea: ".lv-loggingArea"
     },
     listeners: {
         "onCreate.appendMarkup": {
             "this": "{that}.container",
             "method": "append",
-            "args": "<a href=\"#\" class=\"lv-stopControl\">Stop</a><p class=\"lv-loggingArea\"></p>"
+            "args": "{that}.options.markup.componentTemplate"
         },
         "onCreate.bindClickToStop": {
             "funcName": "ca.alanharnum.libraryVoices.bindClickFunction",
-            "args": ["{that}", "stopControl", "{that}.stopSpeaking"]
+            "args": ["{that}", "stopControl", "{that}.stopSpeaking"],
+            "priority": "after:appendMarkup"
+        },
+        "onCreate.bindClickToStart": {
+            "funcName": "ca.alanharnum.libraryVoices.bindClickFunction",
+            "args": ["{that}", "startControl", "{that}.startSpeaking"],
+            "priority": "after:appendMarkup"
         },
         "onCreate.openSocket": {
-            "funcName": "ca.alanharnum.libraryVoices.openSocket",
+            "funcName": "ca.alanharnum.libraryVoices.startSpeaking",
             "args": ["{that}"],
             "priority": "after:appendMarkup"
         }
+    },
+    markup: {
+        componentTemplate: "<p class=\"lv-controlArea\"><a href=\"#\" class=\"lv-control lv-startControl\">Start</a> <a href=\"#\" class=\"lv-stopControl lv-control\">Stop</a></p><p class=\"lv-loggingArea\"></p>"
     },
     model: {
         socketOpts: {
@@ -33,6 +43,10 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
     invokers: {
         "stopSpeaking": {
             funcName: "ca.alanharnum.libraryVoices.stopSpeaking",
+            args: "{that}"
+        },
+        "startSpeaking": {
+            funcName: "ca.alanharnum.libraryVoices.startSpeaking",
             args: "{that}"
         }
     }
@@ -49,10 +63,12 @@ ca.alanharnum.libraryVoices.stopSpeaking = function (that) {
         console.log("stop called");
         that.socket.close();
         that.textToSpeech.cancel();
-        that.locate("loggingArea").text("Shushed! Reload page to resume.");
+        that.locate("loggingArea").text("Shushed!");
 };
 
-ca.alanharnum.libraryVoices.openSocket = function (that) {
+ca.alanharnum.libraryVoices.startSpeaking = function (that) {
+    console.log("start called");
+    that.locate("loggingArea").text("Library voices are speaking...");
     that.socket = new WebSocket(that.model.socketOpts.url);
     that.socket.onmessage = function (e) {
         var terms = JSON.parse(e.data)[0].terms;
@@ -69,7 +85,7 @@ ca.alanharnum.libraryVoices.speakTerms = function (that, terms) {
     });
 
     // Get a random voices
-    var random = ca.alanharnum.libraryVoices.openSocket.randomInt(0, availableVoices.length);
+    var random = ca.alanharnum.libraryVoices.randomInt(0, availableVoices.length);
     var voiceToUse = availableVoices[random];
 
     if(voiceToUse) {
@@ -81,6 +97,6 @@ ca.alanharnum.libraryVoices.speakTerms = function (that, terms) {
     that.textToSpeech.queueSpeech(terms);
 };
 
-ca.alanharnum.libraryVoices.openSocket.randomInt = function (min, max) {
+ca.alanharnum.libraryVoices.randomInt = function (min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 };
