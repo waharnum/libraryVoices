@@ -165,8 +165,8 @@ ca.alanharnum.libraryVoices.speakSearchTerms = function (that, terms, voiceToUse
 
 ca.alanharnum.libraryVoices.handleQueue = function (that) {
     // console.log(that);
-    console.log("handleQueue");
-    console.log(that.model.speechQueue);
+    // console.log("handleQueue");
+    // console.log(that.model.speechQueue);
     // console.log(that.model.speechQueue.length, that.model.currentlySpeaking);
     if(that.model.speechQueue.length > 0 && ! that.model.currentlySpeaking) {
         // console.log("You should queue");
