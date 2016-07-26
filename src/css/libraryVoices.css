@@ -15,15 +15,15 @@ body {
 
 .lv-termsLogItem {
     list-style: none;
-    padding: 0.25em 0 0.25em 0;
+    padding: 0.25em 0 0.25em 0;        
 }
 
 .lv-termsLogItem:nth-child(odd) {
-background-color: #FDD;
+    background-color: #FFefcc;
 }
 
 .lv-termsLogItem:nth-child(even) {
-    background-color: #DDF;
+    background-color: #FFF;
 }
 
 .lv-searchTerms {
