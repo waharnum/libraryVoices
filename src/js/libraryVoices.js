@@ -50,7 +50,7 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
         }
     },
     markup: {
-        componentTemplate: "<h2 class=\"lvPage-header\">Controls</h2><p class=\"lv-controlArea\"><a href=\"#\" class=\"lv-linkControl lvc-startControl\">Start</a> <a href=\"#\" class=\"lvc-stopControl lv-linkControl\">Stop</a> <br> <label>Log Search Terms &amp; Voices: <input type=\"checkbox\" class=\"lvc-termsLogCheck lv-checkboxControl\" /></label> <br> <label>Enable non-English Voices to be Selected: <input type=\"checkbox\" class=\"lvc-nonEngVoicesCheck lv-checkboxControl\" /></label> <h2 class=\"lvPage-header\">Log</h2></p><p aria-live=\"polite\" class=\"lvc-controlLog\"></p><ol aria-live=\"polite\" class=\"lvc-termsLog\"></ol>"
+        componentTemplate: "<h2 class=\"lvPage-header\">Controls</h2><p class=\"lv-controlArea\"><a href=\"#\" class=\"lv-linkControl lvc-startControl\">Start</a> <a href=\"#\" class=\"lvc-stopControl lv-linkControl\">Stop</a> <br> <label>Log Search Terms &amp; Voices: <input type=\"checkbox\" class=\"lvc-termsLogCheck lv-checkboxControl\" /></label> <br> <label>Enable non-English Voices to be Selected: <input type=\"checkbox\" class=\"lvc-nonEngVoicesCheck lv-checkboxControl\" /></label> <h2 class=\"lvPage-header\">Log</h2></p><p aria-live=\"polite\" class=\"lvc-controlLog\"></p><ul aria-live=\"polite\" class=\"lvc-termsLog\"></ul>"
     },
     model: {
         socketOpts: {
@@ -199,7 +199,9 @@ ca.alanharnum.libraryVoices.logTerms = function (that, terms, voice) {
     }
     var voiceName = voice ? voice.name : "unknown";
     var voiceLang = voice ? voice.lang : "unknown";
-    that.locate("termsLog").prepend("<li class=\"lvc-termsLogItem\">Search terms <span class=\"lv-searchTerms\">" + terms + "</span> spoken by <span class=\"lv-voiceCredit\">" + voiceName + " ("+ voiceLang + ")" + "</span></li>");
+    that.locate("termsLog").prepend("<li class=\"lv-termsLogItem lvc-termsLogItem\">Search terms <span class=\"lv-searchTerms\">" + terms + "</span> spoken by <span class=\"lv-voiceCredit\">" + voiceName + " ("+ voiceLang + ")" + "</span></li>");
+    var firstTermsLogItem = that.locate("termsLogItem").first();
+    firstTermsLogItem.animate({"font-size": "150%"}, 500).animate({"font-size": "100%"}, 500);
     var termsLogItems = that.locate("termsLogItem");
     if(termsLogItems.length > that.model.logOpts.maxLength) {
         termsLogItems.last().remove();
