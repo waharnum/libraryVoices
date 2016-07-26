@@ -109,7 +109,7 @@ ca.alanharnum.libraryVoices.stopSpeaking = function (that) {
         that.socket.close();
         that.textToSpeech.cancel();
         that.applier.change("speechQueue", []);
-        that.applier.change("currentlySpeaking", null);        
+        that.applier.change("currentlySpeaking", null);
         that.locate("controlLog").text("Shushed!");
 };
 
@@ -132,6 +132,7 @@ ca.alanharnum.libraryVoices.handleSocketEvent = function (that, terms) {
         });
     }
 
+    // console.log(availableVoices);
     // Get a random voices
     var random = ca.alanharnum.libraryVoices.randomInt(0, availableVoices.length);
     var voiceToUse = availableVoices[random];
@@ -152,14 +153,17 @@ ca.alanharnum.libraryVoices.handleSocketEvent = function (that, terms) {
 ca.alanharnum.libraryVoices.speakSearchTerms = function (that, terms, voiceToUse) {
     // console.log("speakSearchTerms");
     ca.alanharnum.libraryVoices.logTerms(that, terms, voiceToUse);
+    // console.log(voiceToUse);
 
     if(voiceToUse) {
-        that.textToSpeech.applier.change("utteranceOpts.lang", voiceToUse.lang);
-        that.textToSpeech.applier.change("utteranceOpts.voiceURI", voiceToUse.voiceURI);
-        that.textToSpeech.applier.change("utteranceOpts.voice", voiceToUse);
+        that.textToSpeech.queueSpeech(terms, false, {
+            lang: voiceToUse.lang,
+            voice: voiceToUse
+        });
+    } else {
+        that.textToSpeech.queueSpeech(terms);
     }
 
-    that.textToSpeech.queueSpeech(terms);
 };
 
 ca.alanharnum.libraryVoices.handleQueue = function (that) {
