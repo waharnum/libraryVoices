@@ -2,7 +2,15 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
     gradeNames: ["fluid.viewComponent"],
     components: {
         textToSpeech: {
-            type: "fluid.textToSpeech"
+            type: "fluid.textToSpeech",
+            options: {
+                listeners: {
+                    "onStop.handleNext": {
+                        funcName: "ca.alanharnum.libraryVoices.handleNext",
+                        args: ["{libraryVoices}"]
+                    }
+                }
+            }
         }
     },
     selectors: {
@@ -50,6 +58,20 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
         controlOpts: {
             termsLog: false,
             nonEngVoices: false
+        },
+        speechQueue: [
+            // {terms: "", voice: voice}
+        ],
+        currentlySpeaking: null
+    },
+    modelListeners: {
+        speechQueue: {
+            funcName: "ca.alanharnum.libraryVoices.handleQueue",
+            args: ["{that}"]
+        },
+        currentlySpeaking: {
+            funcName: "ca.alanharnum.libraryVoices.handleCurrentlySpeaking",
+            args: ["{that}"]
         }
     },
     invokers: {
@@ -91,11 +113,11 @@ ca.alanharnum.libraryVoices.startSpeaking = function (that) {
     that.socket = new WebSocket(that.model.socketOpts.url);
     that.socket.onmessage = function (e) {
         var terms = JSON.parse(e.data)[0].terms;
-        ca.alanharnum.libraryVoices.speakTerms(that, terms);
+        ca.alanharnum.libraryVoices.handleSocketEvent(that, terms);
     };
 };
 
-ca.alanharnum.libraryVoices.speakTerms = function (that, terms) {
+ca.alanharnum.libraryVoices.handleSocketEvent = function (that, terms) {
     var availableVoices = fluid.copy(that.textToSpeech.getVoices());
 
     // Filter to English-only voices if option is on
@@ -109,6 +131,21 @@ ca.alanharnum.libraryVoices.speakTerms = function (that, terms) {
     var random = ca.alanharnum.libraryVoices.randomInt(0, availableVoices.length);
     var voiceToUse = availableVoices[random];
 
+    var termSpeech = {
+        terms: terms,
+        voice: voiceToUse
+    };
+
+    var speechQueue = fluid.copy(that.model.speechQueue);
+    speechQueue.push(termSpeech);
+
+    that.applier.change("speechQueue", speechQueue);
+
+    // console.log(that.model.speechQueue);
+};
+
+ca.alanharnum.libraryVoices.speakSearchTerms = function (that, terms, voiceToUse) {
+    // console.log("speakSearchTerms");
     ca.alanharnum.libraryVoices.logTerms(that, terms, voiceToUse);
 
     if(voiceToUse) {
@@ -118,6 +155,35 @@ ca.alanharnum.libraryVoices.speakTerms = function (that, terms) {
     }
 
     that.textToSpeech.queueSpeech(terms);
+};
+
+ca.alanharnum.libraryVoices.handleQueue = function (that) {
+    // console.log("handleQueue");
+    // console.log(that);
+    // console.log(that.model.speechQueue.length, that.model.currentlySpeaking);
+    if(that.model.speechQueue.length > 0 && ! that.model.currentlySpeaking) {
+        // console.log("You should queue");
+        ca.alanharnum.libraryVoices.handleCurrentlySpeaking(that);
+    }
+
+};
+
+ca.alanharnum.libraryVoices.handleNext = function (that) {
+    // console.log("handleNext");
+    // console.log(that);
+    that.applier.change("currentlySpeaking", null);
+};
+
+ca.alanharnum.libraryVoices.handleCurrentlySpeaking = function (that) {
+    // console.log("handleCurrentlySpeaking");
+    var currentlySpeaking = that.model.currentlySpeaking;
+    if(currentlySpeaking) {
+        // console.log("you should speak");
+        ca.alanharnum.libraryVoices.speakSearchTerms(that, that.model.currentlySpeaking.terms, that.model.currentlySpeaking.voice);
+    } else {
+        var speakNext = that.model.speechQueue.pop();
+        that.applier.change("currentlySpeaking", speakNext);
+    }
 };
 
 ca.alanharnum.libraryVoices.logTerms = function (that, terms, voice) {
