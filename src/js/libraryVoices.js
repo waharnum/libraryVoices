@@ -19,7 +19,8 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
         termsLogCheck: ".lvc-termsLogCheck",
         nonEngVoicesCheck: ".lvc-nonEngVoicesCheck",
         controlLog: ".lvc-controlLog",
-        termsLog: ".lvc-termsLog"
+        termsLog: ".lvc-termsLog",
+        termsLogItem: ".lvc-termsLogItem"
     },
     listeners: {
         "onCreate.appendMarkup": {
@@ -58,6 +59,9 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
         controlOpts: {
             termsLog: false,
             nonEngVoices: false
+        },
+        logOpts: {
+            maxLength: 10
         },
         speechQueue: [
             // {terms: "", voice: voice}
@@ -104,6 +108,8 @@ ca.alanharnum.libraryVoices.bindCheckableToModelPath = function (that, checkable
 ca.alanharnum.libraryVoices.stopSpeaking = function (that) {
         that.socket.close();
         that.textToSpeech.cancel();
+        that.applier.change("speechQueue", []);
+        that.applier.change("currentlySpeaking", null);
         that.locate("termsLog").empty();
         that.locate("controlLog").text("Shushed!");
 };
@@ -158,8 +164,9 @@ ca.alanharnum.libraryVoices.speakSearchTerms = function (that, terms, voiceToUse
 };
 
 ca.alanharnum.libraryVoices.handleQueue = function (that) {
-    // console.log("handleQueue");
     // console.log(that);
+    console.log("handleQueue");
+    console.log(that.model.speechQueue);
     // console.log(that.model.speechQueue.length, that.model.currentlySpeaking);
     if(that.model.speechQueue.length > 0 && ! that.model.currentlySpeaking) {
         // console.log("You should queue");
@@ -192,7 +199,11 @@ ca.alanharnum.libraryVoices.logTerms = function (that, terms, voice) {
     }
     var voiceName = voice ? voice.name : "unknown";
     var voiceLang = voice ? voice.lang : "unknown";
-    that.locate("termsLog").append("<li>Search terms <span class=\"lv-searchTerms\">" + terms + "</span> spoken by <span class=\"lv-voiceCredit\">" + voiceName + " ("+ voiceLang + ")" + "</span></li>");
+    that.locate("termsLog").prepend("<li class=\"lvc-termsLogItem\">Search terms <span class=\"lv-searchTerms\">" + terms + "</span> spoken by <span class=\"lv-voiceCredit\">" + voiceName + " ("+ voiceLang + ")" + "</span></li>");
+    var termsLogItems = that.locate("termsLogItem");
+    if(termsLogItems.length > that.model.logOpts.maxLength) {
+        termsLogItems.last().remove();
+    }
 };
 
 ca.alanharnum.libraryVoices.randomInt = function (min, max) {
