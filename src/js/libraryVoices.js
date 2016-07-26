@@ -6,12 +6,12 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
         }
     },
     selectors: {
-        stopControl: ".lv-stopControl",
-        startControl: ".lv-startControl",
-        termsLogCheck: ".lv-termsLogCheck",
-        nonEngVoicesCheck: ".lv-nonEngVoicesCheck",
-        controlLog: ".lv-controlLog",
-        termsLog: ".lv-termsLog"
+        stopControl: ".lvc-stopControl",
+        startControl: ".lvc-startControl",
+        termsLogCheck: ".lvc-termsLogCheck",
+        nonEngVoicesCheck: ".lvc-nonEngVoicesCheck",
+        controlLog: ".lvc-controlLog",
+        termsLog: ".lvc-termsLog"
     },
     listeners: {
         "onCreate.appendMarkup": {
@@ -41,7 +41,7 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
         }
     },
     markup: {
-        componentTemplate: "<h2 class=\"lvPage-header\">Controls</h2><p class=\"lv-controlArea\"><a href=\"#\" class=\"lv-linkControl lv-startControl\">Start</a> <a href=\"#\" class=\"lv-stopControl lv-linkControl\">Stop</a> <br> <label>Log Search Terms &amp; Voices: <input type=\"checkbox\" class=\"lv-termsLogCheck lv-checkboxControl\" /></label> <br> <label>Enable non-English Voices to be Selected: <input type=\"checkbox\" class=\"lv-nonEngVoicesCheck lv-checkboxControl\" /></label> <h2 class=\"lvPage-header\">Log</h2></p><p aria-live=\"polite\" class=\"lv-controlLog\"></p><ol aria-live=\"polite\" class=\"lv-termsLog\"></ol>"
+        componentTemplate: "<h2 class=\"lvPage-header\">Controls</h2><p class=\"lv-controlArea\"><a href=\"#\" class=\"lv-linkControl lvc-startControl\">Start</a> <a href=\"#\" class=\"lvc-stopControl lv-linkControl\">Stop</a> <br> <label>Log Search Terms &amp; Voices: <input type=\"checkbox\" class=\"lvc-termsLogCheck lv-checkboxControl\" /></label> <br> <label>Enable non-English Voices to be Selected: <input type=\"checkbox\" class=\"lvc-nonEngVoicesCheck lv-checkboxControl\" /></label> <h2 class=\"lvPage-header\">Log</h2></p><p aria-live=\"polite\" class=\"lvc-controlLog\"></p><ol aria-live=\"polite\" class=\"lvc-termsLog\"></ol>"
     },
     model: {
         socketOpts: {
