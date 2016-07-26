@@ -15,7 +15,7 @@ body {
 
 .lv-termsLogItem {
     list-style: none;
-    padding: 0.25em 0 0.25em 0;        
+    padding: 0.25em 0 0.25em 0;
 }
 
 .lv-termsLogItem:nth-child(odd) {
@@ -28,6 +28,8 @@ body {
 
 .lv-searchTerms {
     font-weight: bold;
+    font-family: monospace;
+    font-size: 1.3em;
 }
 
 .lv-voiceCredit {

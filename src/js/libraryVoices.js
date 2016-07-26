@@ -109,8 +109,7 @@ ca.alanharnum.libraryVoices.stopSpeaking = function (that) {
         that.socket.close();
         that.textToSpeech.cancel();
         that.applier.change("speechQueue", []);
-        that.applier.change("currentlySpeaking", null);
-        that.locate("termsLog").empty();
+        that.applier.change("currentlySpeaking", null);        
         that.locate("controlLog").text("Shushed!");
 };
 
