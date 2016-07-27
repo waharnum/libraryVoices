@@ -109,7 +109,7 @@ ca.alanharnum.libraryVoices.stopSpeaking = function (that) {
         that.socket.close();
         that.textToSpeech.cancel();
         that.applier.change("speechQueue", []);
-        that.applier.change("currentlySpeaking", null);        
+        that.applier.change("currentlySpeaking", null);
         that.locate("controlLog").text("Shushed!");
 };
 
@@ -198,7 +198,7 @@ ca.alanharnum.libraryVoices.logTerms = function (that, terms, voice) {
     }
     var voiceName = voice ? voice.name : "unknown";
     var voiceLang = voice ? voice.lang : "unknown";
-    that.locate("termsLog").prepend("<li class=\"lv-termsLogItem lvc-termsLogItem\">Search terms <span class=\"lv-searchTerms\">" + terms + "</span> spoken by <span class=\"lv-voiceCredit\">" + voiceName + " ("+ voiceLang + ")" + "</span></li>");
+    that.locate("termsLog").prepend("<li class=\"lv-termsLogItem lvc-termsLogItem\"><div class=\"lv-voiceCredit\">" + voiceName + " ("+ voiceLang + "): " + " </div><div class=\"lv-searchTerms\">" + terms + "</div></li>");
     var firstTermsLogItem = that.locate("termsLogItem").first();
     firstTermsLogItem.animate({"font-size": "150%"}, 500).animate({"font-size": "100%"}, 500);
     var termsLogItems = that.locate("termsLogItem");

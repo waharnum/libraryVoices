@@ -18,22 +18,23 @@ body {
     padding: 0.25em 0 0.25em 0;
 }
 
-.lv-termsLogItem:nth-child(odd) {
-    background-color: #FFefcc;
-}
-
-.lv-termsLogItem:nth-child(even) {
-    background-color: #FFF;
-}
-
 .lv-searchTerms {
+    background-color: #FFefcc;
+    position: relative;
     font-weight: bold;
     font-family: monospace;
     font-size: 1.3em;
+    border: 1px solid black;
+    border-radius: 0.25em;
+    padding: 0.5em;
+    margin-left: 0.5em;
+    box-shadow: inset 0 1px 1px hsla(0,0%,100%,.5),3px 3px 0 hsla(0,0%,0%,.1);
 }
 
 .lv-voiceCredit {
     font-style: italic;
+    margin-left: -0.5em;
+    padding-bottom: 0.25em;
 }
 
 .lv-linkControl {
