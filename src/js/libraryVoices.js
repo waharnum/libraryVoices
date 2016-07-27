@@ -66,7 +66,12 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
         speechQueue: [
             // {terms: "", voice: voice}
         ],
-        currentlySpeaking: null
+        currentlySpeaking: null,
+        poem: {
+            originalTerms: [],
+            stringRepresentation: "",
+            length: 0
+        }
     },
     modelListeners: {
         speechQueue: {
@@ -109,7 +114,7 @@ ca.alanharnum.libraryVoices.stopSpeaking = function (that) {
         that.socket.close();
         that.textToSpeech.cancel();
         that.applier.change("speechQueue", []);
-        that.applier.change("currentlySpeaking", null);        
+        that.applier.change("currentlySpeaking", null);
         that.locate("controlLog").text("Shushed!");
 };
 
@@ -201,10 +206,30 @@ ca.alanharnum.libraryVoices.logTerms = function (that, terms, voice) {
     that.locate("termsLog").prepend("<li class=\"lv-termsLogItem lvc-termsLogItem\">Search terms <span class=\"lv-searchTerms\">" + terms + "</span> spoken by <span class=\"lv-voiceCredit\">" + voiceName + " ("+ voiceLang + ")" + "</span></li>");
     var firstTermsLogItem = that.locate("termsLogItem").first();
     firstTermsLogItem.animate({"font-size": "150%"}, 500).animate({"font-size": "100%"}, 500);
+    firstTermsLogItem.click(function (e) {
+        var clickedItem = $(this);
+        ca.alanharnum.libraryVoices.addToPoem(that, terms);
+        e.preventDefault();
+        clickedItem.css({
+            "background-color": "#000",
+            "color": "#FFF"
+        });
+        clickedItem.off("click");
+    });
     var termsLogItems = that.locate("termsLogItem");
     if(termsLogItems.length > that.model.logOpts.maxLength) {
         termsLogItems.last().remove();
     }
+};
+
+ca.alanharnum.libraryVoices.addToPoem = function (that, terms, voice) {
+    var currentPoemTerms = fluid.copy(that.model.poem.originalTerms);
+    currentPoemTerms.push(terms);
+    that.applier.change("poem.originalTerms", currentPoemTerms);
+    var stringRepresentation = currentPoemTerms.join("");
+    that.applier.change("poem.stringRepresentation", stringRepresentation);
+    that.applier.change("poem.length", stringRepresentation.length);
+    console.log(that.model.poem);
 };
 
 ca.alanharnum.libraryVoices.randomInt = function (min, max) {
