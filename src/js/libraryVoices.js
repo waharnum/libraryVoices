@@ -50,7 +50,7 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
         }
     },
     markup: {
-        componentTemplate: "<h2 class=\"lvPage-header\">Controls</h2><p class=\"lv-controlArea\"><a href=\"#\" class=\"lv-linkControl lvc-startControl\">Start</a> <a href=\"#\" class=\"lvc-stopControl lv-linkControl\">Stop</a> <br> <label>Log Search Terms &amp; Voices: <input type=\"checkbox\" class=\"lvc-termsLogCheck lv-checkboxControl\" /></label> <br> <label>Enable non-English Voices to be Selected: <input type=\"checkbox\" class=\"lvc-nonEngVoicesCheck lv-checkboxControl\" /></label> <h2 class=\"lvPage-header\">Log</h2></p><p aria-live=\"polite\" class=\"lvc-controlLog\"></p><ul aria-live=\"polite\" class=\"lvc-termsLog\"></ul>"
+        componentTemplate: "<h2 class=\"lvPage-header\">Controls</h2><p class=\"lv-controlArea\"><a href=\"#\" class=\"lv-linkControl lv-startControl lvc-startControl\">Play <span class=\"lv-startControlIcon material-icons\">play_circle_outline</span></a> <a href=\"#\" class=\"lvc-stopControl lv-stopControl lv-activeControl lv-linkControl\">Pause <span class=\"lv-stopControlIcon material-icons\">pause_circle_outline</span></a> <br> <label>Log Search Terms &amp; Voices: <input type=\"checkbox\" class=\"lvc-termsLogCheck lv-checkboxControl\" /></label> <br> <label>Enable Non-English Voices: <input type=\"checkbox\" class=\"lvc-nonEngVoicesCheck lv-checkboxControl\" /></label> <h2 class=\"lvPage-header\">Log</h2></p><p aria-live=\"polite\" class=\"lvc-controlLog\">Shushed!</p><ul aria-live=\"polite\" class=\"lvc-termsLog\"></ul>"
     },
     model: {
         socketOpts: {
@@ -106,7 +106,12 @@ ca.alanharnum.libraryVoices.bindCheckableToModelPath = function (that, checkable
 };
 
 ca.alanharnum.libraryVoices.stopSpeaking = function (that) {
-        that.socket.close();
+        that.locate("startControl").removeClass("lv-activeControl");
+        that.locate("stopControl").addClass("lv-activeControl");
+        // Only close the socket if it exists
+        if(that.socket) {
+            that.socket.close();
+        }
         that.textToSpeech.cancel();
         that.applier.change("speechQueue", []);
         that.applier.change("currentlySpeaking", null);
@@ -114,8 +119,13 @@ ca.alanharnum.libraryVoices.stopSpeaking = function (that) {
 };
 
 ca.alanharnum.libraryVoices.startSpeaking = function (that) {
+    that.locate("startControl").addClass("lv-activeControl");
+    that.locate("stopControl").removeClass("lv-activeControl");
     that.locate("controlLog").text("Library voices are speaking...");
-    that.socket = new WebSocket(that.model.socketOpts.url);
+    // Create the socket if it doesn't exist yet, or if it's closing/closed    
+    if(!that.socket || that.socket.readyState >= 2) {
+        that.socket = new WebSocket(that.model.socketOpts.url);
+    }
     that.socket.onmessage = function (e) {
         var terms = JSON.parse(e.data)[0].terms;
         ca.alanharnum.libraryVoices.handleSocketEvent(that, terms);
