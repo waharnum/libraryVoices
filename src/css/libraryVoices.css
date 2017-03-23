@@ -7,7 +7,7 @@ body {
 
 .lvPage-mainContainer {
     width: 75vw;
-    height: calc(90vw - 2em);
+    height: calc(90vh - 2em);
     margin: auto;
     margin-top: 1em;
     margin-bottom: 1em;
