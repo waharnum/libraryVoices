@@ -54,7 +54,7 @@ fluid.defaults("ca.alanharnum.libraryVoices", {
     },
     model: {
         socketOpts: {
-            url: "ws://45.55.209.67:4571/rtsearches"
+            url: "ws://138.197.129.181:4571/rtsearches"
         },
         controlOpts: {
             termsLog: false,
@@ -122,7 +122,7 @@ ca.alanharnum.libraryVoices.startSpeaking = function (that) {
     that.locate("startControl").addClass("lv-activeControl");
     that.locate("stopControl").removeClass("lv-activeControl");
     that.locate("controlLog").text("Library voices are speaking...");
-    // Create the socket if it doesn't exist yet, or if it's closing/closed    
+    // Create the socket if it doesn't exist yet, or if it's closing/closed
     if(!that.socket || that.socket.readyState >= 2) {
         that.socket = new WebSocket(that.model.socketOpts.url);
     }
