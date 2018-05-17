@@ -9,7 +9,7 @@ Viewable live at http://libraryvoices.alanharnum.ca/
 ## License (BSD 2-Clause):
 
 ```
-Copyright (c) 2016, Alan Harnum
+Copyright (c) 2016-2017, Alan Harnum
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
